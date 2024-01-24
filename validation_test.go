@@ -3,6 +3,7 @@ package go_validation
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"strings"
 	"testing"
 )
 
@@ -297,6 +298,45 @@ func TestAliasTag(t *testing.T) {
 	}
 
 	err := validate.Struct(user)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func MusValidUsername(field validator.FieldLevel) bool {
+	value, ok := field.Field().Interface().(string)
+	if ok {
+		if value != strings.ToUpper(value) {
+			return false
+		}
+		if len(value) < 5 {
+			return false
+		}
+	}
+	return true
+}
+
+func TestCustomValidation(t *testing.T) {
+	validate := validator.New()
+	err := validate.RegisterValidation("mustupper", MusValidUsername)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	type User struct {
+		Id       string `validate:"required,min=5"`
+		Email    string `validate:"required,email"`
+		Username string `validate:"mustupper"`
+	}
+
+	user := User{
+		Id:       "123",
+		Email:    "test@gmail.com",
+		Username: "TESTT",
+	}
+
+	err = validate.Struct(user)
 
 	if err != nil {
 		fmt.Println(err.Error())
