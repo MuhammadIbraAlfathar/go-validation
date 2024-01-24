@@ -279,3 +279,26 @@ func TestValidateBasicCollection(t *testing.T) {
 	}
 
 }
+
+func TestAliasTag(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterAlias("varchar", "required,max=255")
+
+	type User struct {
+		Id       string `validate:"varchar,min=5"`
+		Email    string `validate:"varchar,email"`
+		Username string `validate:"varchar"`
+	}
+
+	user := User{
+		Id:       "123",
+		Email:    "test@gmail.com",
+		Username: "testt",
+	}
+
+	err := validate.Struct(user)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
