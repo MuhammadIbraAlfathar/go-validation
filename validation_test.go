@@ -3,6 +3,8 @@ package go_validation
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -341,4 +343,44 @@ func TestCustomValidation(t *testing.T) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+}
+
+var regexNumber = regexp.MustCompile("^[0-9]+$")
+
+func MustValidPin(field validator.FieldLevel) bool {
+	length, err := strconv.Atoi(field.Param())
+	if err != nil {
+		panic(err)
+	}
+	value := field.Field().String()
+
+	if !regexNumber.MatchString(value) {
+		return false
+	}
+
+	return len(value) == length
+}
+
+func TestCustomValidParam(t *testing.T) {
+	validate := validator.New()
+	err := validate.RegisterValidation("validPin", MustValidPin)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	type Login struct {
+		Phone string `validate:"required,number"`
+		Pin   string `validate:"required,validPin=6"`
+	}
+
+	login := Login{
+		Phone: "088678686786",
+		Pin:   "133321",
+	}
+
+	err = validate.Struct(login)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
