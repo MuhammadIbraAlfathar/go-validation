@@ -229,3 +229,53 @@ func TestValidateCollection(t *testing.T) {
 	}
 
 }
+
+func TestValidateBasicCollection(t *testing.T) {
+
+	type Address struct {
+		City    string `validate:"required"`
+		Country string `validate:"required"`
+	}
+
+	type RegisterUser struct {
+		Email           string    `validate:"required,email"`
+		Password        string    `validate:"required,min=5"`
+		ConfirmPassword string    `validate:"required,min=5,eqfield=Password"`
+		Address         []Address `validate:"required,dive"`
+		Hobby           []string  `validate:"required,dive,required,min=5"`
+	}
+
+	validate := validator.New()
+
+	registerUser := RegisterUser{
+		Email:           "test@gmail.com",
+		Password:        "test123",
+		ConfirmPassword: "test123",
+		Address: []Address{
+			{
+				City:    "",
+				Country: "",
+			},
+			{
+				City:    "",
+				Country: "",
+			},
+			{
+				City:    "",
+				Country: "",
+			},
+		},
+		Hobby: []string{
+			"Gaming",
+			"Coding",
+			"",
+			"tes",
+		},
+	}
+
+	err := validate.Struct(registerUser)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+}
