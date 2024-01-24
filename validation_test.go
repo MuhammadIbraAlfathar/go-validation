@@ -47,3 +47,14 @@ func TestMultipleTag(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 }
+
+func TestTagParameter(t *testing.T) {
+	validate := validator.New()
+	user := "23131321312"
+
+	err := validate.Var(user, "required,number,min=10,max=20")
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
