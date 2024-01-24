@@ -58,3 +58,38 @@ func TestTagParameter(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 }
+
+func TestValidateStruct(t *testing.T) {
+	type LoginRequest struct {
+		Email    string `validate:"required,email"`
+		Username string `validate:"required,max=50"`
+	}
+
+	type CreatePassword struct {
+		Password        string `validate:"required,eqfield"`
+		ConfirmPassword string `validate:"required,eqfield"`
+	}
+
+	validate := validator.New()
+
+	loginRequest := LoginRequest{
+		Email:    "testing@gmail.com",
+		Username: "testing123",
+	}
+
+	createPassword := CreatePassword{
+		Password:        "test",
+		ConfirmPassword: "test",
+	}
+
+	err2 := validate.VarWithValue(createPassword.Password, createPassword.ConfirmPassword, "eqfield")
+	if err2 != nil {
+		fmt.Println(err2.Error())
+	}
+
+	err := validate.Struct(loginRequest)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
