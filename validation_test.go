@@ -384,3 +384,20 @@ func TestCustomValidParam(t *testing.T) {
 	}
 
 }
+
+func TestOrRule(t *testing.T) {
+	type User struct {
+		Username string `validate:"required,email|numeric"`
+	}
+
+	validate := validator.New()
+
+	user := User{
+		Username: "test",
+	}
+
+	err := validate.Struct(user)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
